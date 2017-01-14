@@ -1,23 +1,23 @@
 FROM ubuntu:12.04
-LABEL maintainer="Jeff Geerling"
+MAINTAINER "Brett Delle Grazie" <brett.dellegrazie@gmail.com>
+ENV container=docker DEBIAN_FRONTEND=noninteractive DEBIAN_PRIORITY=critical LANG=C.UTF-8
 
 # Install dependencies.
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-       software-properties-common \
-       python-software-properties \
-    && rm -rf /var/lib/apt/lists/* \
-    && rm -Rf /usr/share/doc && rm -Rf /usr/share/man \
-    && apt-get clean
-# Install Ansible.
-RUN apt-add-repository -y ppa:ansible/ansible \
-    && apt-get update \
-    && apt-get install -y --no-install-recommends \
-       ansible \
-    && rm -rf /var/lib/apt/lists/* \
-    && rm -Rf /usr/share/doc && rm -Rf /usr/share/man \
-    && touch -m -t 200101010101.01 /var/lib/apt/lists \
-    && apt-get clean
+RUN apt-get -y -qq update &&\
+ apt-get -y -qq install apt-utils software-properties-common python-software-properties &&\
+ rm -Rf /usr/share/doc &&\
+ rm -Rf /usr/share/man &&\
+ apt-get -y -qq clean &&\
+ rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# Install Ansible and other requirements.
+RUN add-apt-repository -y ppa:ansible/ansible &&\
+ apt-get -y -qq update &&\
+ apt-get -y -qq install sudo net-tools curl ansible &&\
+ rm -Rf /usr/share/doc &&\
+ rm -Rf /usr/share/man &&\
+ apt-get -y -qq clean &&\
+ rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Install Ansible inventory file
 RUN echo "[local]\nlocalhost ansible_connection=local" > /etc/ansible/hosts
